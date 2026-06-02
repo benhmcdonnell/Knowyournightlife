@@ -65,7 +65,7 @@ Rules:
 
   const requestBody = JSON.stringify({
     model: 'claude-sonnet-4-5',
-    max_tokens: 4096,
+    max_tokens: 2048,
     messages: [{ role: 'user', content: prompt }]
   });
 
