@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KnowYourNightlife</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f4f5f7;
+      --card-bg: #1a1a2e;
+      --card-border: #2a2a45;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0b8;
+      --accent: #7c3aed;
+      --input-bg: #ffffff;
+      --tag-bg: #2a2a45;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      color: #1a1a2e;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: #1a1a2e;
+      padding: 24px 20px 32px;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+    header h1 span { color: #a78bfa; }
+    header p {
+      color: #a0a0b8;
+      font-size: 0.9rem;
+      margin-top: 6px;
+    }
+
+    /* ── SEARCH BAR ── */
+    .search-wrap {
+      display: flex;
+      gap: 10px;
+      max-width: 560px;
+      margin: 22px auto 0;
+    }
+    .search-wrap input {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: #1a1a2e;
+      outline: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .search-wrap input::placeholder { color: #9ca3af; }
+    .search-wrap button {
+      padding: 14px 22px;
+      border-radius: 12px;
+      border: none;
+      background: #7c3aed;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .search-wrap button:hover { background: #6d28d9; }
+    .search-wrap button:disabled { background: #4c1d95; cursor: not-allowed; }
+
+    /* ── FILTERS ── */
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 700px;
+      margin: 16px auto 0;
+      padding: 0 20px;
+    }
+    .filter-chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1.5px solid #c4c4d8;
+      background: #fff;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .filter-chip:hover { border-color: #7c3aed; color: #7c3aed; }
+    .filter-chip.active { background: #7c3aed; border-color: #7c3aed; color: #fff; }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+
+    /* ── LOADING ── */
+    .loading {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 60px 20px;
+      color: #555;
+      font-size: 0.95rem;
+    }
+    .loading.visible { display: flex; }
+    .spinner {
+      width: 44px; height: 44px;
+      border: 4px solid #e0e0ef;
+      border-top-color: #7c3aed;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── ERROR ── */
+    .error-msg {
+      display: none;
+      background: #fff0f0;
+      border: 1.5px solid #fca5a5;
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: #b91c1c;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+    .error-msg.visible { display: block; }
+
+    /* ── SUMMARY BOX ── */
+    .summary-box {
+      background: #1a1a2e;
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      color: #e0e0f0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .summary-box h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #a78bfa;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .summary-sources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .source-pill {
+      padding: 3px 10px;
+      background: #2a2a45;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: #a0a0b8;
+    }
+
+    /* ── VENUE CARD ── */
+    .venue-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+      color: var(--text-primary);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .venue-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    .venue-card.hidden { display: none; }
+
+    .venue-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .venue-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .venue-meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .venue-type {
+      font-size: 0.8rem;
+      color: #a0a0b8;
+      background: #2a2a45;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+    .venue-neighborhood {
+      font-size: 0.82rem;
+      color: #a0a0b8;
+    }
+    .venue-price {
+      font-size: 0.82rem;
+      color: #a0a0b8;
+    }
+
+    .venue-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .venue-rating {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fbbf24;
+    }
+    .venue-website a {
+      font-size: 0.78rem;
+      color: #a78bfa;
+      text-decoration: none;
+    }
+    .venue-website a:hover { text-decoration: underline; }
+
+    .venue-description {
+      font-size: 0.9rem;
+      color: #c0c0d8;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    /* ── INFO BLOCKS ── */
+    .info-blocks {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 600px) {
+      .info-blocks { grid-template-columns: 1fr; }
+    }
+
+    .info-block {
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .info-block-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      opacity: 0.85;
+    }
+    .info-block-value {
+      font-size: 0.82rem;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+    .info-block-sub {
+      font-size: 0.75rem;
+      margin-top: 4px;
+      opacity: 0.8;
+      line-height: 1.4;
+    }
+
+    /* Getting In colors */
+    .getting-in-easy  { background: #064e3b; color: #6ee7b7; }
+    .getting-in-medium { background: #78350f; color: #fcd34d; }
+    .getting-in-hard  { background: #7f1d1d; color: #fca5a5; }
+    .getting-in-vip   { background: #3b0764; color: #d8b4fe; }
+
+    /* Age & IDs colors */
+    .age-strict   { background: #7f1d1d; color: #fca5a5; }
+    .age-moderate { background: #78350f; color: #fcd34d; }
+    .age-chill    { background: #064e3b; color: #6ee7b7; }
+
+    /* Stay or Hop colors */
+    .stay-stay { background: #1e3a5f; color: #93c5fd; }
+    .stay-hop  { background: #3b0764; color: #d8b4fe; }
+    .stay-either { background: #064e3b; color: #6ee7b7; }
+
+    /* Dots */
+    .dots { display: flex; gap: 3px; margin-top: 5px; }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.3;
+    }
+    .dot.filled { opacity: 1; }
+
+    /* ── TAGS ── */
+    .venue-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .tag {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.73rem;
+      font-weight: 600;
+      background: #2a2a45;
+      color: #a78bfa;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Know Your <span>Nightlife</span></h1>
+  <p>AI-powered guides to bars, clubs & late-night spots in any city</p>
+  <div class="search-wrap">
+    <input type="text" id="cityInput" placeholder="Enter a city (e.g. Miami, Chicago…)" />
+    <button id="searchBtn" onclick="doSearch()">
+      <i class="ti ti-search"></i> Search
+    </button>
+  </div>
+  <div class="filters">
+    <span class="filter-chip active" data-filter="all">All</span>
+    <span class="filter-chip" data-filter="club">Clubs</span>
+    <span class="filter-chip" data-filter="bar">Bars</span>
+    <span class="filter-chip" data-filter="rooftop">Rooftop</span>
+    <span class="filter-chip" data-filter="lounge">Lounge</span>
+    <span class="filter-chip" data-filter="dive">Dive Bar</span>
+    <span class="filter-chip" data-filter="budget">Budget-friendly</span>
+    <span class="filter-chip" data-filter="upscale">Upscale</span>
+  </div>
+</header>
+
+<main>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <span>Finding the best spots… this takes 10–15 seconds</span>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <div id="results"></div>
+</main>
+
+<script>
+  let activeFilter = 'all';
+  let allCards = [];
+
+  // Filter chips
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeFilter = chip.dataset.filter;
+      applyFilter();
+    });
+  });
+
+  // Enter key
+  document.getElementById('cityInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+  });
+
+  function applyFilter() {
+    allCards.forEach(({ el, venue }) => {
+      if (activeFilter === 'all') {
+        el.classList.remove('hidden');
+        return;
+      }
+      const type = (venue.type || '').toLowerCase();
+      const tags = (venue.tags || []).map(t => t.toLowerCase()).join(' ');
+      const price = (venue.price || '');
+      const combined = type + ' ' + tags;
+
+      let show = false;
+      if (activeFilter === 'club')   show = combined.includes('club');
+      if (activeFilter === 'bar')    show = combined.includes('bar');
+      if (activeFilter === 'rooftop') show = combined.includes('rooftop');
+      if (activeFilter === 'lounge') show = combined.includes('lounge');
+      if (activeFilter === 'dive')   show = combined.includes('dive');
+      if (activeFilter === 'budget') show = combined.includes('budget') || price === '$';
+      if (activeFilter === 'upscale') show = combined.includes('upscale') || price === '$$$$' || price === '$$$';
+
+      el.classList.toggle('hidden', !show);
+    });
+  }
+
+  async function doSearch() {
+    const city = document.getElementById('cityInput').value.trim();
+    if (!city) return;
+
+    const btn = document.getElementById('searchBtn');
+    const loading = document.getElementById('loading');
+    const errorMsg = document.getElementById('errorMsg');
+    const results = document.getElementById('results');
+
+    btn.disabled = true;
+    loading.classList.add('visible');
+    errorMsg.classList.remove('visible');
+    results.innerHTML = '';
+    allCards = [];
+
+    try {
+      const res = await fetch('/.netlify/functions/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ city })
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      renderResults(data);
+    } catch (err) {
+      errorMsg.textContent = 'Could not connect. Check Netlify function logs for details. (' + err.message + ')';
+      errorMsg.classList.add('visible');
+    } finally {
+      btn.disabled = false;
+      loading.classList.remove('visible');
+    }
+  }
+
+  function dots(n, total = 5) {
+    let html = '<div class="dots">';
+    for (let i = 1; i <= total; i++) {
+      html += `<div class="dot ${i <= n ? 'filled' : ''}"></div>`;
+    }
+    return html + '</div>';
+  }
+
+  function gettingInClass(difficulty) {
+    const map = { easy: 'getting-in-easy', medium: 'getting-in-medium', hard: 'getting-in-hard', vip: 'getting-in-vip' };
+    return map[difficulty] || 'getting-in-easy';
+  }
+
+  function ageClass(text) {
+    const t = (text || '').toLowerCase();
+    if (t.includes('scan') || t.includes('strict')) return 'age-strict';
+    if (t.includes('moderate') || t.includes('sometimes')) return 'age-moderate';
+    return 'age-chill';
+  }
+
+  function stayClass(type) {
+    const map = { stay: 'stay-stay', hop: 'stay-hop', either: 'stay-either' };
+    return map[type] || 'stay-either';
+  }
+
+  function renderResults(data) {
+    const results = document.getElementById('results');
+    allCards = [];
+
+    // Summary box
+    if (data.summary) {
+      const box = document.createElement('div');
+      box.className = 'summary-box';
+      box.innerHTML = `
+        <h2>About the Scene</h2>
+        <p>${data.summary}</p>
+        ${data.sources && data.sources.length ? `
+          <div class="summary-sources">
+            ${data.sources.map(s => `<span class="source-pill">${s}</span>`).join('')}
+          </div>` : ''}
+      `;
+      results.appendChild(box);
+    }
+
+    // Venue cards
+    (data.venues || []).forEach(venue => {
+      const gi = venue.getting_in || {};
+      const sh = venue.stay_or_hop || {};
+
+      const card = document.createElement('div');
+      card.className = 'venue-card';
+      card.innerHTML = `
+        <div class="venue-top">
+          <div>
+            <div class="venue-name">${venue.name || ''}</div>
+            <div class="venue-meta">
+              <span class="venue-type">${venue.type || ''}</span>
+              <span class="venue-neighborhood">${venue.neighborhood || ''}</span>
+              <span class="venue-price">${venue.price || ''}</span>
+            </div>
+          </div>
+          <div class="venue-right">
+            ${venue.rating ? `<div class="venue-rating"><i class="ti ti-star-filled"></i> ${venue.rating}</div>` : ''}
+            ${venue.website ? `<div class="venue-website"><a href="${venue.website}" target="_blank" rel="noopener">Website ↗</a></div>` : ''}
+          </div>
+        </div>
+
+        <p class="venue-description">${venue.description || ''}</p>
+
+        <div class="info-blocks">
+          <div class="info-block ${gettingInClass(gi.difficulty)}">
+            <div class="info-block-label"><i class="ti ti-door-enter"></i> Getting In</div>
+            <div class="info-block-value">${gi.difficulty_label || gi.difficulty || ''}</div>
+            ${dots(gi.dots || 1)}
+            ${gi.tip ? `<div class="info-block-sub">${gi.tip}</div>` : ''}
+          </div>
+
+          <div class="info-block ${ageClass(venue.age_id)}">
+            <div class="info-block-label"><i class="ti ti-id"></i> Age & IDs</div>
+            <div class="info-block-value">${venue.age_id || ''}</div>
+          </div>
+
+          <div class="info-block ${stayClass(sh.type)}">
+            <div class="info-block-label"><i class="ti ti-clock"></i> Stay or Hop</div>
+            <div class="info-block-value">${sh.type === 'stay' ? 'Stay All Night' : sh.type === 'hop' ? 'Bar Hop Stop' : 'Either'}</div>
+            ${sh.tip ? `<div class="info-block-sub">${sh.tip}</div>` : ''}
+          </div>
+        </div>
+
+        ${venue.hours ? `<div style="font-size:0.8rem;color:#a0a0b8;margin-bottom:10px;"><i class="ti ti-clock-hour-4"></i> ${venue.hours}</div>` : ''}
+
+        <div class="venue-tags">
+          ${(venue.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}
+        </div>
+      `;
+
+      results.appendChild(card);
+      allCards.push({ el: card, venue });
+    });
+
+    applyFilter();
+  }
+</script>
+</body>
+</html>
