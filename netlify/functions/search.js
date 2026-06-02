@@ -58,14 +58,14 @@ Return this exact structure:
 }
 
 Rules:
-- Include 4-5 venues with a mix: at least one upscale club, one mid-range bar, one dive bar/budget spot, one rooftop or unique venue
+- Include 5-7 venues with a mix: at least one upscale club, one mid-range bar, one dive bar/budget spot, one rooftop or unique venue
 - dots: 1=very easy, 2=easy, 3=moderate, 4=hard, 5=vip/nearly impossible
 - Use real venue names and accurate information for ${city}
 - ONLY output raw JSON, nothing else`;
 
   const requestBody = JSON.stringify({
     model: 'claude-sonnet-4-5',
-    max_tokens: 1024,
+    max_tokens: 4096,
     messages: [{ role: 'user', content: prompt }]
   });
 
